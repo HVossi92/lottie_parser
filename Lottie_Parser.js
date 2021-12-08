@@ -1,29 +1,45 @@
 const renderLottie = require('puppeteer-lottie')
 const fs = require('fs')
+const path = require('path')
 const num = 4
-const inputFile = `/home/vossi/Documents/Master_Thesis/WebScraping/Scraped_Data/lottie_jsons/lottie_json_${num}.json`
-const outputFolder = '/home/vossi/Documents/Master_Thesis/WebScraping/Scraped_Data/lottie_gifs/'
+//const inputFile = `/Users/h.vosskamp/Documents/Private/Hagen/2021_22_WiSe/Master_Thesis/Webscraping/Lottie_Jsons/lottie_json_${num}.json`
+//const inputFile = `/Users/h.vosskamp/Documents/Private/Hagen/2021_22_WiSe/Master_Thesis/Webscraping/Lottie_Jsons/`
+const inputFile = `/Users/h.vosskamp/Documents/Private/Hagen/2021_22_WiSe/Master_Thesis/Webscraping/Lottie_Jsons/part_0`
+const outputFolder = '/Users/h.vosskamp/Documents/Private/Hagen/2021_22_WiSe/Master_Thesis/Webscraping/Lottie_gifs/'
 
 process.on('uncaughtException', function (err) {
     console.error(err);
     console.log("Node NOT Exiting...");
 });
+
 readFiles()
 
 function readFiles() {
-    console.log(inputFile)
-    const fileData = fs.readFileSync(inputFile);
-    const json = JSON.parse(fileData.toString());
-    try {
-        if (isArray(json)) {
-            json.forEach(element => treatFile(element))
-        } else {
-            treatFile(json)
+    const jsonsInDir = fs.readdirSync(inputFile).filter(file => path.extname(file) === '.json');
+
+    jsonsInDir.forEach(file => {
+        const fileData = fs.readFileSync(path.join(inputFile, file));
+        let json
+
+        try {
+            json = JSON.parse(fileData.toString());
+        } catch (e) {
+            console.log(e)
+            return
         }
-    } catch (e) {
-        console.log(e)
-    }
-    console.log("Finished")
+
+        console.log(inputFile)
+        try {
+            if (isArray(json)) {
+                json.forEach(element => treatFile(element))
+            } else {
+                treatFile(json)
+            }
+        } catch (e) {
+            console.log(e)
+        }
+        console.log("Finished")
+    });
 }
 
 function treatFile(json) {
